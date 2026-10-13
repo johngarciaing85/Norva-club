@@ -12,7 +12,7 @@ class ImageOut(BaseModel):
     alt: str
 
 
-class ProductOut(BaseModel):
+class ProductSummaryOut(BaseModel):
     id: str
     slug: str
     name: str
@@ -24,11 +24,15 @@ class ProductOut(BaseModel):
     variants: list[VariantOut]
     images: list[ImageOut]
     availability: str
-    updatedAt: str | None = None
+    inventoryUpdatedAt: str | None = None
+
+
+class ProductOut(ProductSummaryOut):
+    sizeGuide: str | None = None
 
 
 class ProductListOut(BaseModel):
-    products: list[ProductOut]
+    products: list[ProductSummaryOut]
     total: int
     page: int
     page_size: int

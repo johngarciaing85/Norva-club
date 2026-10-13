@@ -5,18 +5,19 @@ import { ImageGallery } from "./ImageGallery";
 import { SizeSelector } from "./SizeSelector";
 import { AvailabilityBadge } from "./AvailabilityBadge";
 import { WhatsAppButton } from "./WhatsAppButton";
-import { formatCOP } from "@/lib/format";
-import { isOutOfStock } from "@/lib/mock-data";
+import { formatCOP, isOutOfStock } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import type { Product } from "@/types";
 
 interface ProductDetailProps {
   product: Product;
+  sizeGuide?: string | null;
 }
 
-export function ProductDetail({ product }: ProductDetailProps) {
+export function ProductDetail({ product, sizeGuide }: ProductDetailProps) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const soldOut = isOutOfStock(product);
+  const [guideOpen, setGuideOpen] = useState(false);
+  const soldOut = isOutOfStock(product.variants);
   const needsSize = product.sizeType !== "unica";
 
   return (
@@ -53,7 +54,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
         <AvailabilityBadge
           availability={product.availability}
-          updatedAt={product.updatedAt}
+          inventoryUpdatedAt={product.inventoryUpdatedAt}
         />
 
         {!soldOut && (
@@ -63,6 +64,24 @@ export function ProductDetail({ product }: ProductDetailProps) {
             needsSize={needsSize}
             availability={product.availability}
           />
+        )}
+
+        {sizeGuide && (
+          <div className="border-t border-border pt-4">
+            <button
+              onClick={() => setGuideOpen(!guideOpen)}
+              className="flex w-full items-center justify-between text-sm font-medium"
+              aria-expanded={guideOpen}
+            >
+              Guía de medidas
+              <span className="text-muted-foreground">{guideOpen ? "−" : "+"}</span>
+            </button>
+            {guideOpen && (
+              <div className="mt-3 text-sm text-muted-foreground whitespace-pre-line leading-relaxed">
+                {sizeGuide}
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

@@ -24,7 +24,7 @@ export interface Product {
   variants: SizeVariant[];
   images: ProductImage[];
   availability: Availability;
-  updatedAt: string;
+  inventoryUpdatedAt: string | null;
 }
 
 export interface Category {

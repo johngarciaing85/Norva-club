@@ -1,13 +1,13 @@
 import { Badge } from "@/components/ui/badge";
-import { formatDate } from "@/lib/format";
+import { formatInventoryDate } from "@/lib/format";
 import type { Availability } from "@/types";
 
 interface AvailabilityBadgeProps {
   availability: Availability;
-  updatedAt: string;
+  inventoryUpdatedAt: string | null;
 }
 
-export function AvailabilityBadge({ availability, updatedAt }: AvailabilityBadgeProps) {
+export function AvailabilityBadge({ availability, inventoryUpdatedAt }: AvailabilityBadgeProps) {
   const label =
     availability === "inmediata" ? "Entrega inmediata" : "Bajo confirmación";
 
@@ -19,9 +19,11 @@ export function AvailabilityBadge({ availability, updatedAt }: AvailabilityBadge
       >
         {label}
       </Badge>
-      <p className="text-xs text-muted-foreground">
-        Inventario actualizado el {formatDate(updatedAt)}
-      </p>
+      {inventoryUpdatedAt && (
+        <p className="text-xs text-muted-foreground">
+          Inventario actualizado el {formatInventoryDate(inventoryUpdatedAt)}
+        </p>
+      )}
     </div>
   );
 }

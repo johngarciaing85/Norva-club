@@ -31,7 +31,7 @@ def engine():
 def db(engine):
     conn = engine.connect()
     trans = conn.begin()
-    session = Session(bind=conn)
+    session = Session(bind=conn, join_transaction_mode="create_savepoint")
     yield session
     session.close()
     trans.rollback()

@@ -53,7 +53,7 @@ export default function AdminDashboard() {
   );
 
   const lastUpdate = adminProducts.reduce(
-    (latest, p) => (p.updatedAt > latest ? p.updatedAt : latest),
+    (latest, p) => ((p.inventoryUpdatedAt ?? "") > latest ? p.inventoryUpdatedAt! : latest),
     ""
   );
 

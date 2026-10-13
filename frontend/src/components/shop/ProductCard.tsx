@@ -1,8 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { formatCOP } from "@/lib/format";
-import { isOutOfStock } from "@/lib/mock-data";
+import { formatCOP, isOutOfStock } from "@/lib/format";
 import type { Product } from "@/types";
 
 interface ProductCardProps {
@@ -10,7 +9,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const soldOut = isOutOfStock(product);
+  const soldOut = isOutOfStock(product.variants);
 
   return (
     <Link

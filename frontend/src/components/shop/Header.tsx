@@ -3,9 +3,13 @@
 import Link from "next/link";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Logo } from "@/components/brand/Logo";
-import { categories } from "@/lib/mock-data";
+import type { Category } from "@/types";
 
-export function Header() {
+interface HeaderProps {
+  categories: Category[];
+}
+
+export function Header({ categories }: HeaderProps) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);

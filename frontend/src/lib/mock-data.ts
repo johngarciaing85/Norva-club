@@ -53,7 +53,7 @@ export const products: Product[] = [
       { id: "img-1b", url: placeholder("#2a2a2a", "Oversize Back"), alt: "Camiseta Oversize NÓRVA vista trasera" },
     ],
     availability: "inmediata",
-    updatedAt: "2026-10-08",
+    inventoryUpdatedAt: "2026-10-08",
   },
   {
     id: "prod-2",
@@ -76,7 +76,7 @@ export const products: Product[] = [
       { id: "img-2a", url: placeholder("#0d0d0d", "Básica Negra"), alt: "Camiseta Básica Negra" },
     ],
     availability: "bajo_confirmacion",
-    updatedAt: "2026-10-05",
+    inventoryUpdatedAt: "2026-10-05",
   },
   {
     id: "prod-3",
@@ -99,7 +99,7 @@ export const products: Product[] = [
       { id: "img-3a", url: placeholder("#333", "Move Different"), alt: 'Camiseta Move Different' },
     ],
     availability: "inmediata",
-    updatedAt: "2026-10-09",
+    inventoryUpdatedAt: "2026-10-09",
   },
   {
     id: "prod-4",
@@ -123,7 +123,7 @@ export const products: Product[] = [
       { id: "img-4b", url: placeholder("#4a4a4a", "Cargo Detail"), alt: "Pantalón Cargo Urban detalle bolsillo" },
     ],
     availability: "inmediata",
-    updatedAt: "2026-10-07",
+    inventoryUpdatedAt: "2026-10-07",
   },
   {
     id: "prod-5",
@@ -146,7 +146,7 @@ export const products: Product[] = [
       { id: "img-5a", url: placeholder("#555", "Jogger"), alt: "Jogger Essential" },
     ],
     availability: "bajo_confirmacion",
-    updatedAt: "2026-10-06",
+    inventoryUpdatedAt: "2026-10-06",
   },
   {
     id: "prod-6",
@@ -162,7 +162,7 @@ export const products: Product[] = [
       { id: "img-6a", url: placeholder("#222", "Snapback"), alt: "Gorra Snapback NÓRVA" },
     ],
     availability: "inmediata",
-    updatedAt: "2026-10-09",
+    inventoryUpdatedAt: "2026-10-09",
   },
   {
     id: "prod-7",
@@ -178,7 +178,7 @@ export const products: Product[] = [
       { id: "img-7a", url: placeholder("#111", "Reloj"), alt: "Reloj Minimal Black" },
     ],
     availability: "bajo_confirmacion",
-    updatedAt: "2026-10-04",
+    inventoryUpdatedAt: "2026-10-04",
   },
   {
     id: "prod-8",
@@ -202,7 +202,7 @@ export const products: Product[] = [
       { id: "img-8b", url: placeholder("#777", "Hoodie Back"), alt: "Hoodie Oversized Gris vista trasera" },
     ],
     availability: "inmediata",
-    updatedAt: "2026-10-08",
+    inventoryUpdatedAt: "2026-10-08",
   },
 ];
 

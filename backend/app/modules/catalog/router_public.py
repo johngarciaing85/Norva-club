@@ -29,12 +29,18 @@ def _product_to_dict(p: Product) -> dict:
             for img in p.images
         ],
         "availability": p.availability.value,
-        "updatedAt": (
-            p.inventory_updated_at.date().isoformat()
+        "inventoryUpdatedAt": (
+            p.inventory_updated_at.isoformat()
             if p.inventory_updated_at
             else None
         ),
     }
+
+
+def _product_detail_to_dict(p: Product) -> dict:
+    d = _product_to_dict(p)
+    d["sizeGuide"] = p.size_guide
+    return d
 
 
 @router.get("/categories", response_model=list[CategoryOut])
@@ -75,4 +81,4 @@ def get_product(slug: str, db: Session = Depends(get_db)):
     product = service.get_product_by_slug(db, slug)
     if product is None:
         raise NotFoundError("Producto", slug)
-    return _product_to_dict(product)
+    return _product_detail_to_dict(product)

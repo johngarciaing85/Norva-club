@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { categories, products } from "@/lib/mock-data";
+import { fetchCategories, fetchProducts } from "@/lib/api/client";
 import { ProductGrid } from "@/components/shop/ProductGrid";
 
 export const metadata: Metadata = {
@@ -9,7 +9,25 @@ export const metadata: Metadata = {
     "Tienda de ropa streetwear colombiana. Camisetas, pantalones y accesorios urbanos. Move Different.",
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  let categories: Awaited<ReturnType<typeof fetchCategories>> = [];
+  let products: Awaited<ReturnType<typeof fetchProducts>> | null = null;
+
+  try {
+    [categories, products] = await Promise.all([
+      fetchCategories(),
+      fetchProducts(),
+    ]);
+  } catch {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-24 text-center">
+        <p className="text-muted-foreground">
+          No pudimos cargar el catálogo, intenta de nuevo en unos minutos.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <>
       <section className="relative flex items-center justify-center bg-foreground text-background py-24 sm:py-32 px-4">
@@ -59,7 +77,7 @@ export default function HomePage() {
         <h2 className="font-heading text-xl font-bold uppercase tracking-wider mb-8">
           Productos
         </h2>
-        <ProductGrid products={products} />
+        <ProductGrid products={products.products} />
       </section>
     </>
   );

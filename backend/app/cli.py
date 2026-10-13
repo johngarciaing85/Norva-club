@@ -75,8 +75,7 @@ def _get_size(session: Session, label: str, group: SizeGroup) -> Size:
 def _seed_demo(session: Session) -> None:
     existing = session.scalar(select(func.count()).select_from(Category))
     if existing and existing > 0:
-        print("Los datos de demostración ya existen. Omitiendo.")
-        return
+        return False
 
     cats = [
         Category(name="Camisetas", slug="camisetas", description="Camisetas oversize y streetwear", size_type=SizeGroup.ropa, sort_order=1),
@@ -217,6 +216,7 @@ def _seed_demo(session: Session) -> None:
             ))
 
     session.flush()
+    return True
 
 
 def main() -> None:
@@ -236,9 +236,12 @@ def main() -> None:
                 print("ERROR: seed-demo no puede ejecutarse en producción.")
                 sys.exit(1)
             _seed_sizes(session)
-            _seed_demo(session)
+            loaded = _seed_demo(session)
             session.commit()
-            print("Datos de demostración cargados.")
+            if loaded:
+                print("Datos de demostración cargados.")
+            else:
+                print("Los datos de demostración ya existen, no se cargaron de nuevo.")
     except Exception:
         session.rollback()
         raise

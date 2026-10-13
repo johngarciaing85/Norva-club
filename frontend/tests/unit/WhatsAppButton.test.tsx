@@ -20,7 +20,7 @@ const baseProduct: Product = {
   ],
   images: [],
   availability: "inmediata",
-  updatedAt: "2026-10-09",
+  inventoryUpdatedAt: "2026-10-09",
 };
 
 beforeEach(() => {

@@ -38,6 +38,14 @@ export function Footer() {
 
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-widest text-background/50 mb-3">
+              Información
+            </h3>
+            <nav className="flex flex-col gap-2 mb-6">
+              <Link href="/cambios-y-devoluciones" className="text-sm text-background/80 hover:text-background transition-colors">
+                Cambios y devoluciones
+              </Link>
+            </nav>
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-background/50 mb-3">
               Contacto
             </h3>
             <div className="flex flex-col gap-2 text-sm text-background/80">

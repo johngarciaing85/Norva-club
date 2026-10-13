@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { categories } from "@/lib/mock-data";
 import { ProductGrid } from "@/components/shop/ProductGrid";
-import type { Product } from "@/types";
+import type { Product, Category } from "@/types";
 
 interface CategoryFilterProps {
   products: Product[];
+  categories: Category[];
 }
 
-export function CategoryFilter({ products }: CategoryFilterProps) {
+export function CategoryFilter({ products, categories }: CategoryFilterProps) {
   const [active, setActive] = useState<string | null>(null);
 
   const filtered = active

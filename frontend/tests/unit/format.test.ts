@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatCOP, formatDate } from "@/lib/format";
+import { formatCOP, formatInventoryDate, isOutOfStock } from "@/lib/format";
 
 describe("formatCOP", () => {
   it("formats a typical price", () => {
@@ -19,10 +19,29 @@ describe("formatCOP", () => {
   });
 });
 
-describe("formatDate", () => {
-  it("formats an ISO date string to spanish locale", () => {
-    const result = formatDate("2026-10-08");
+describe("formatInventoryDate", () => {
+  it("formats a UTC datetime to Bogota timezone date", () => {
+    // 2026-10-13 01:30 UTC = 2026-10-12 20:30 Bogotá (UTC-5)
+    const result = formatInventoryDate("2026-10-13T01:30:00+00:00");
+    expect(result).toContain("12");
+    expect(result).toContain("octubre");
     expect(result).toContain("2026");
-    expect(result).toContain("8");
+  });
+
+  it("keeps same-day dates in Bogota", () => {
+    // 2026-10-13 18:00 UTC = 2026-10-13 13:00 Bogotá
+    const result = formatInventoryDate("2026-10-13T18:00:00+00:00");
+    expect(result).toContain("13");
+    expect(result).toContain("octubre");
+  });
+});
+
+describe("isOutOfStock", () => {
+  it("returns true when all variants have zero stock", () => {
+    expect(isOutOfStock([{ stock: 0 }, { stock: 0 }])).toBe(true);
+  });
+
+  it("returns false when any variant has stock", () => {
+    expect(isOutOfStock([{ stock: 0 }, { stock: 1 }])).toBe(false);
   });
 });

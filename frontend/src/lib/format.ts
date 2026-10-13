@@ -7,11 +7,26 @@ export function formatCOP(amount: number): string {
   return `$${formatted}`;
 }
 
-export function formatDate(dateStr: string): string {
-  const date = new Date(dateStr + "T00:00:00");
+export function formatDate(dateString: string): string {
+  const [year, month, day] = dateString.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
   return date.toLocaleDateString("es-CO", {
     day: "numeric",
     month: "long",
     year: "numeric",
+  });
+}
+
+export function isOutOfStock(variants: { stock: number }[]): boolean {
+  return variants.every((v) => v.stock === 0);
+}
+
+export function formatInventoryDate(isoString: string): string {
+  const date = new Date(isoString);
+  return date.toLocaleDateString("es-CO", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "America/Bogota",
   });
 }

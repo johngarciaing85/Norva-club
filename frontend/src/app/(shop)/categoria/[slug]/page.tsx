@@ -1,12 +1,9 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { categories, getProductsByCategory, getCategoryBySlug } from "@/lib/mock-data";
+import { fetchCategories, fetchProducts, ApiError } from "@/lib/api/client";
 import { ProductGrid } from "@/components/shop/ProductGrid";
 
-export function generateStaticParams() {
-  return categories.map((c) => ({ slug: c.slug }));
-}
+export const instant = false;
 
 export async function generateMetadata({
   params,
@@ -14,20 +11,47 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const category = getCategoryBySlug(slug);
-  if (!category) return { title: "Categoría no encontrada" };
-  return {
-    title: category.name,
-    description: category.description,
-  };
+  try {
+    const categories = await fetchCategories();
+    const category = categories.find((c) => c.slug === slug);
+    if (!category) return { title: "Categoría no encontrada" };
+    return {
+      title: category.name,
+      description: category.description,
+    };
+  } catch {
+    return { title: "Categoría" };
+  }
 }
 
-async function CategoriaContent({ params }: { params: Promise<{ slug: string }> }) {
+export default async function CategoriaPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
-  const category = getCategoryBySlug(slug);
-  if (!category) notFound();
 
-  const categoryProducts = getProductsByCategory(slug);
+  let categories;
+  let data;
+
+  try {
+    [categories, data] = await Promise.all([
+      fetchCategories(),
+      fetchProducts(slug),
+    ]);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-24 text-center">
+        <p className="text-muted-foreground">
+          No pudimos cargar el catálogo, intenta de nuevo en unos minutos.
+        </p>
+      </div>
+    );
+  }
+
+  const category = categories.find((c) => c.slug === slug);
+  if (!category) notFound();
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
@@ -35,19 +59,7 @@ async function CategoriaContent({ params }: { params: Promise<{ slug: string }> 
         {category.name}
       </h1>
       <p className="text-muted-foreground mb-8">{category.description}</p>
-      <ProductGrid products={categoryProducts} />
+      <ProductGrid products={data.products} />
     </div>
-  );
-}
-
-export default function CategoriaPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  return (
-    <Suspense>
-      <CategoriaContent params={params} />
-    </Suspense>
   );
 }

@@ -84,6 +84,7 @@ class Product(Base):
     name: Mapped[str] = mapped_column(String(200))
     slug: Mapped[str] = mapped_column(String(200), unique=True, index=True)
     description: Mapped[str] = mapped_column(Text, default="")
+    size_guide: Mapped[str | None] = mapped_column(Text)
     price_cop: Mapped[int] = mapped_column(BigInteger)
     status: Mapped[ProductStatus] = mapped_column(
         _product_status_type, default=ProductStatus.borrador, index=True
