@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Plus, Search } from "lucide-react";
-import { adminProducts } from "@/lib/admin-mock-data";
+import { adminListProducts } from "@/lib/api/admin";
+import type { AdminProductDetail } from "@/lib/api/admin";
 import { formatCOP } from "@/lib/format";
 import { ProductStatusBadge } from "@/components/admin/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -26,16 +27,25 @@ const statusOptions: { value: ProductStatus | "todos"; label: string }[] = [
 ];
 
 export default function ProductosPage() {
+  const [products, setProducts] = useState<AdminProductDetail[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<ProductStatus | "todos">("todos");
 
-  const filtered = useMemo(() => {
-    return adminProducts.filter((p) => {
-      const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase());
-      const matchesStatus = statusFilter === "todos" || p.status === statusFilter;
-      return matchesSearch && matchesStatus;
-    });
+  const loadProducts = useCallback(async () => {
+    setIsLoading(true);
+    const data = await adminListProducts(
+      search || undefined,
+      statusFilter !== "todos" ? statusFilter : undefined,
+    );
+    setProducts(data);
+    setIsLoading(false);
   }, [search, statusFilter]);
+
+  useEffect(() => {
+    const timer = setTimeout(loadProducts, 300);
+    return () => clearTimeout(timer);
+  }, [loadProducts]);
 
   const totalStock = (variants: { stock: number }[]) =>
     variants.reduce((sum, v) => sum + v.stock, 0);
@@ -79,74 +89,80 @@ export default function ProductosPage() {
         </div>
       </div>
 
-      {/* Desktop table */}
-      <div className="hidden rounded-lg border md:block">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Precio</TableHead>
-              <TableHead>Stock total</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead className="w-24">Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.map((product) => (
-              <TableRow key={product.id}>
-                <TableCell className="font-medium">{product.name}</TableCell>
-                <TableCell className="tabular-nums">
-                  {formatCOP(product.price)}
-                </TableCell>
-                <TableCell className="tabular-nums">
-                  {totalStock(product.variants)}
-                </TableCell>
-                <TableCell>
-                  <ProductStatusBadge status={product.status} />
-                </TableCell>
-                <TableCell>
-                  <Link href={`/admin/productos/${product.id}`}>
-                    <Button variant="ghost" size="xs">
-                      Editar
-                    </Button>
-                  </Link>
-                </TableCell>
-              </TableRow>
-            ))}
-            {filtered.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground">
-                  No se encontraron productos
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      {isLoading ? (
+        <p className="py-8 text-center text-sm text-muted-foreground">Cargando…</p>
+      ) : (
+        <>
+          {/* Desktop table */}
+          <div className="hidden rounded-lg border md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Precio</TableHead>
+                  <TableHead>Stock total</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead className="w-24">Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {products.map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell className="font-medium">{product.name}</TableCell>
+                    <TableCell className="tabular-nums">
+                      {formatCOP(product.price)}
+                    </TableCell>
+                    <TableCell className="tabular-nums">
+                      {totalStock(product.variants)}
+                    </TableCell>
+                    <TableCell>
+                      <ProductStatusBadge status={product.status} />
+                    </TableCell>
+                    <TableCell>
+                      <Link href={`/admin/productos/${product.id}`}>
+                        <Button variant="ghost" size="xs">
+                          Editar
+                        </Button>
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {products.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center text-muted-foreground">
+                      No se encontraron productos
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
 
-      {/* Mobile cards */}
-      <div className="space-y-3 md:hidden">
-        {filtered.map((product) => (
-          <Link
-            key={product.id}
-            href={`/admin/productos/${product.id}`}
-            className="flex items-center justify-between rounded-lg border bg-card p-3 transition-colors hover:bg-accent"
-          >
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-medium">{product.name}</p>
-              <p className="text-sm text-muted-foreground tabular-nums">
-                {formatCOP(product.price)} · Stock: {totalStock(product.variants)}
+          {/* Mobile cards */}
+          <div className="space-y-3 md:hidden">
+            {products.map((product) => (
+              <Link
+                key={product.id}
+                href={`/admin/productos/${product.id}`}
+                className="flex items-center justify-between rounded-lg border bg-card p-3 transition-colors hover:bg-accent"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium">{product.name}</p>
+                  <p className="text-sm text-muted-foreground tabular-nums">
+                    {formatCOP(product.price)} · Stock: {totalStock(product.variants)}
+                  </p>
+                </div>
+                <ProductStatusBadge status={product.status} />
+              </Link>
+            ))}
+            {products.length === 0 && (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                No se encontraron productos
               </p>
-            </div>
-            <ProductStatusBadge status={product.status} />
-          </Link>
-        ))}
-        {filtered.length === 0 && (
-          <p className="py-8 text-center text-sm text-muted-foreground">
-            No se encontraron productos
-          </p>
-        )}
-      </div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

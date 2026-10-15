@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+export const instant = false;
+
 export const metadata: Metadata = {
   title: "Cambios y devoluciones",
   description: "Política de cambios y devoluciones de NÓRVA STYLE.",

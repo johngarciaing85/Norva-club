@@ -6,15 +6,19 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { productSchema, type ProductFormData } from "@/lib/validation";
-import { mockAction } from "@/lib/admin-mock-data";
-import { categories } from "@/lib/mock-data";
+import {
+  adminCreateProduct,
+  adminUpdateProduct,
+  adminArchiveProduct,
+  adminListCategories,
+} from "@/lib/api/admin";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { ImageUploader } from "./ImageUploader";
-import type { AdminProduct, SizeType } from "@/types";
+import type { AdminProduct, Category, SizeType } from "@/types";
 
 const ROPA_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 const CALZADO_SIZES = ["36", "37", "38", "39", "40", "41", "42", "43", "44"];
@@ -31,17 +35,35 @@ function getSizesForType(sizeType: SizeType): string[] {
   }
 }
 
+interface ImageData {
+  id?: string;
+  url: string;
+  alt?: string;
+  publicId?: string | null;
+}
+
 interface ProductFormProps {
-  product?: AdminProduct;
+  product?: AdminProduct & { sizeGuide?: string | null };
 }
 
 export function ProductForm({ product }: ProductFormProps) {
   const router = useRouter();
   const isEditing = !!product;
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
-  const [images, setImages] = useState<string[]>(
-    product?.images.map((img) => img.url) ?? []
+  const [showArchiveDialog, setShowArchiveDialog] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [images, setImages] = useState<ImageData[]>(
+    product?.images.map((img) => ({
+      id: img.id,
+      url: img.url,
+      alt: img.alt,
+      publicId: (img as ImageData).publicId ?? null,
+    })) ?? [],
   );
+
+  useEffect(() => {
+    adminListCategories().then(setCategories).catch(() => {});
+  }, []);
 
   const {
     register,
@@ -88,16 +110,42 @@ export function ProductForm({ product }: ProductFormProps) {
       setValue("sizeType", cat.sizeType);
       replace(getSizesForType(cat.sizeType).map((s) => ({ size: s, stock: 0 })));
     }
-  }, [selectedCategoryId, selectedSizeType, setValue, replace]);
+  }, [selectedCategoryId, selectedSizeType, setValue, replace, categories]);
 
-  async function onSubmit(_: ProductFormData) {
+  async function onSubmit(data: ProductFormData) {
     try {
-      // TODO(Fase 6): replace with real API call
-      await mockAction(800);
-      toast.success(isEditing ? "Producto actualizado" : "Producto creado");
+      const payload = {
+        ...data,
+        images: images.map((img, i) => ({
+          id: img.id,
+          url: img.url,
+          alt: img.alt ?? "",
+          publicId: img.publicId,
+          sortOrder: i,
+        })),
+      };
+
+      if (isEditing && product) {
+        await adminUpdateProduct(product.id, payload);
+        toast.success("Producto actualizado");
+      } else {
+        await adminCreateProduct(payload);
+        toast.success("Producto creado");
+      }
       router.push("/admin/productos");
     } catch {
       toast.error("Error al guardar el producto");
+    }
+  }
+
+  async function handleArchive() {
+    if (!product) return;
+    try {
+      await adminArchiveProduct(product.id);
+      toast.success("Producto archivado");
+      router.push("/admin/productos");
+    } catch {
+      toast.error("Error al archivar el producto");
     }
   }
 
@@ -233,6 +281,15 @@ export function ProductForm({ product }: ProductFormProps) {
                 ? "Guardar cambios"
                 : "Crear producto"}
           </Button>
+          {isEditing && product.status !== "archivado" && (
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => setShowArchiveDialog(true)}
+            >
+              Archivar
+            </Button>
+          )}
           <Button type="button" variant="outline" onClick={handleBack}>
             Cancelar
           </Button>
@@ -248,6 +305,18 @@ export function ProductForm({ product }: ProductFormProps) {
         variant="destructive"
         onConfirm={() => router.push("/admin/productos")}
       />
+
+      {isEditing && (
+        <ConfirmDialog
+          open={showArchiveDialog}
+          onOpenChange={setShowArchiveDialog}
+          title="Archivar producto"
+          description={`¿Estás seguro de archivar "${product.name}"? El producto dejará de mostrarse en la tienda.`}
+          confirmLabel="Archivar"
+          variant="destructive"
+          onConfirm={handleArchive}
+        />
+      )}
     </>
   );
 }

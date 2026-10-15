@@ -10,6 +10,8 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.database import SessionLocal
+from app.core.security import hash_password
+from app.modules.auth.models import AdminUser
 from app.modules.catalog.models import (
     Availability,
     Category,
@@ -221,7 +223,9 @@ def _seed_demo(session: Session) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="NÓRVA STYLE CLI")
-    parser.add_argument("command", choices=["seed-sizes", "seed-demo"])
+    parser.add_argument("command", choices=["seed-sizes", "seed-demo", "create-admin"])
+    parser.add_argument("--email", help="Admin email (for create-admin)")
+    parser.add_argument("--password", help="Admin password (for create-admin)")
     args = parser.parse_args()
 
     session = SessionLocal()
@@ -242,6 +246,26 @@ def main() -> None:
                 print("Datos de demostración cargados.")
             else:
                 print("Los datos de demostración ya existen, no se cargaron de nuevo.")
+
+        elif args.command == "create-admin":
+            email = args.email
+            password = args.password
+            if not email or not password:
+                print("ERROR: --email y --password son obligatorios.")
+                sys.exit(1)
+            existing = session.scalar(
+                select(AdminUser).where(AdminUser.email == email)
+            )
+            if existing:
+                print(f"Ya existe un admin con email {email}.")
+                sys.exit(1)
+            admin = AdminUser(
+                email=email,
+                password_hash=hash_password(password),
+            )
+            session.add(admin)
+            session.commit()
+            print(f"Admin creado: {email}")
     except Exception:
         session.rollback()
         raise

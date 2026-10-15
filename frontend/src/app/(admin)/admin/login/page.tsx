@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginFormData } from "@/lib/validation";
-import { mockAction } from "@/lib/admin-mock-data";
+import { adminLogin, AdminApiError } from "@/lib/api/admin";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -22,14 +22,17 @@ export default function AdminLoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
-  async function onSubmit(_: LoginFormData) {
+  async function onSubmit(data: LoginFormData) {
     setError(null);
     try {
-      // TODO(Fase 5): replace with real auth call
-      await mockAction(800);
+      await adminLogin(data.email, data.password);
       router.push("/admin");
-    } catch {
-      setError("Credenciales incorrectas. Intenta de nuevo.");
+    } catch (err) {
+      if (err instanceof AdminApiError && err.status === 401) {
+        setError("Credenciales incorrectas. Intenta de nuevo.");
+      } else {
+        setError("Error de conexión. Intenta más tarde.");
+      }
     }
   }
 

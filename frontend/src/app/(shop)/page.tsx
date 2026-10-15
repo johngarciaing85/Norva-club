@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { fetchCategories, fetchProducts } from "@/lib/api/client";
 import { ProductGrid } from "@/components/shop/ProductGrid";
 
+export const instant = false;
+
 export const metadata: Metadata = {
   title: "NÓRVA STYLE — Streetwear Colombiano",
   description:

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { fetchCategories, fetchProducts } from "@/lib/api/client";
 import { CategoryFilter } from "./CategoryFilter";
 
+export const instant = false;
+
 export const metadata: Metadata = {
   title: "Catálogo",
   description: "Explora toda nuestra colección de streetwear colombiano.",
