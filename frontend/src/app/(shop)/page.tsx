@@ -12,23 +12,23 @@ export const metadata: Metadata = {
     "Tienda de ropa streetwear colombiana. Camisetas, pantalones y accesorios urbanos. Move Different.",
 };
 
+const STATIC_CATEGORIES = [
+  { slug: "camisetas", name: "Camisetas", description: "Camisetas oversize y streetwear" },
+  { slug: "pantalones", name: "Pantalones", description: "Pantalones cargo y joggers" },
+  { slug: "accesorios", name: "Accesorios", description: "Gorras, relojes y complementos" },
+];
+
 export default async function HomePage() {
-  let categories: Awaited<ReturnType<typeof fetchCategories>> = [];
+  let categories = STATIC_CATEGORIES;
   let products: Awaited<ReturnType<typeof fetchProducts>> | null = null;
 
   try {
     [categories, products] = await Promise.all([
-      fetchCategories(),
+      fetchCategories().catch(() => STATIC_CATEGORIES),
       fetchProducts(),
     ]);
   } catch {
-    return (
-      <div className="mx-auto max-w-7xl px-4 py-24 text-center">
-        <p className="text-muted-foreground">
-          No pudimos cargar el catálogo, intenta de nuevo en unos minutos.
-        </p>
-      </div>
-    );
+    // API not available — show page without products
   }
 
   return (
@@ -78,12 +78,14 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
-        <h2 className="font-heading text-xl font-bold uppercase tracking-wider mb-8">
-          Productos
-        </h2>
-        <ProductGrid products={products.products} />
-      </section>
+      {products && (
+        <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
+          <h2 className="font-heading text-xl font-bold uppercase tracking-wider mb-8">
+            Productos
+          </h2>
+          <ProductGrid products={products.products} />
+        </section>
+      )}
     </>
   );
 }
