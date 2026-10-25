@@ -26,6 +26,9 @@ def _cookie_opts() -> dict:
     opts = dict(_COOKIE_OPTS)
     if settings.ENVIRONMENT == "production":
         opts["secure"] = True
+        opts["samesite"] = "none"
+        if settings.COOKIE_DOMAIN:
+            opts["domain"] = settings.COOKIE_DOMAIN
     return opts
 
 
@@ -59,7 +62,8 @@ def logout(
     if session_token:
         revoke_session(db, session_token)
     db.commit()
-    response.delete_cookie(**{k: v for k, v in _COOKIE_OPTS.items() if k != "max_age"})
+    delete_opts = {k: v for k, v in _cookie_opts().items() if k != "max_age"}
+    response.delete_cookie(**delete_opts)
     return {"ok": True}
 
 
