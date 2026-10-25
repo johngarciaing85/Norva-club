@@ -8,7 +8,6 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.dependencies import get_current_admin
 from app.core.errors import NotFoundError
-from app.modules.auth.models import AdminUser
 from app.modules.catalog import service
 from app.modules.catalog.models import Product, Size
 from app.modules.catalog.schemas import (
@@ -81,7 +80,6 @@ def get_product(product_id: uuid.UUID, db: Session = Depends(get_db)):
 def create_product(
     body: ProductCreateIn,
     db: Session = Depends(get_db),
-    _admin: AdminUser = Depends(get_current_admin),
 ):
     product = service.create_product(db, body.model_dump())
     db.commit()
@@ -94,12 +92,11 @@ def update_product(
     product_id: uuid.UUID,
     body: ProductUpdateIn,
     db: Session = Depends(get_db),
-    _admin: AdminUser = Depends(get_current_admin),
 ):
     product = service.get_product_by_id(db, product_id)
     if product is None:
         raise NotFoundError("Producto", str(product_id))
-    data = body.model_dump(exclude_none=True)
+    data = body.model_dump(exclude_unset=True)
     service.update_product(db, product, data)
     db.commit()
     db.refresh(product)
@@ -110,7 +107,6 @@ def update_product(
 def archive_product(
     product_id: uuid.UUID,
     db: Session = Depends(get_db),
-    _admin: AdminUser = Depends(get_current_admin),
 ):
     product = service.get_product_by_id(db, product_id)
     if product is None:
@@ -139,7 +135,6 @@ def list_categories(db: Session = Depends(get_db)):
 def create_category(
     body: CategoryCreateIn,
     db: Session = Depends(get_db),
-    _admin: AdminUser = Depends(get_current_admin),
 ):
     cat = service.create_category(db, body.model_dump())
     db.commit()
@@ -158,12 +153,11 @@ def update_category(
     category_id: uuid.UUID,
     body: CategoryUpdateIn,
     db: Session = Depends(get_db),
-    _admin: AdminUser = Depends(get_current_admin),
 ):
     cat = service.get_category_by_id(db, category_id)
     if cat is None:
         raise NotFoundError("Categoría", str(category_id))
-    data = body.model_dump(exclude_none=True)
+    data = body.model_dump(exclude_unset=True)
     service.update_category(db, cat, data)
     db.commit()
     db.refresh(cat)
@@ -180,7 +174,6 @@ def update_category(
 def delete_category(
     category_id: uuid.UUID,
     db: Session = Depends(get_db),
-    _admin: AdminUser = Depends(get_current_admin),
 ):
     cat = service.get_category_by_id(db, category_id)
     if cat is None:
@@ -214,7 +207,6 @@ def list_sizes(
 def create_size(
     body: SizeCreateIn,
     db: Session = Depends(get_db),
-    _admin: AdminUser = Depends(get_current_admin),
 ):
     size = service.create_size(db, body.label, body.sizeGroup)
     db.commit()
@@ -231,7 +223,6 @@ def create_size(
 def delete_size(
     size_id: uuid.UUID,
     db: Session = Depends(get_db),
-    _admin: AdminUser = Depends(get_current_admin),
 ):
     size = db.get(Size, size_id)
     if size is None:

@@ -87,7 +87,8 @@ def list_all_products(
         stmt = stmt.where(Product.status == ProductStatus(status))
 
     if search:
-        stmt = stmt.where(Product.name.ilike(f"%{search}%"))
+        escaped = search.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        stmt = stmt.where(Product.name.ilike(f"%{escaped}%"))
 
     stmt = stmt.order_by(Product.created_at.desc())
     return list(session.scalars(stmt))
@@ -218,6 +219,7 @@ def delete_size(session: Session, size: Size) -> None:
 
 def _sync_variants(session: Session, product: Product, variants_data: list[dict]) -> None:
     existing = {v.size.label: v for v in product.variants}
+    size_group = product.category.size_type
 
     for vd in variants_data:
         size_label = vd["size"]
@@ -228,7 +230,7 @@ def _sync_variants(session: Session, product: Product, variants_data: list[dict]
             del existing[size_label]
         else:
             size = session.scalar(
-                select(Size).where(Size.label == size_label)
+                select(Size).where(Size.label == size_label, Size.size_group == size_group)
             )
             if size:
                 session.add(ProductVariant(

@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.dependencies import get_current_admin
+from app.core.rate_limit import limiter
 from app.modules.auth.models import AdminUser
 from app.modules.auth.schemas import AdminUserOut, LoginRequest
 from app.modules.auth.service import authenticate, create_session, revoke_session
@@ -29,9 +30,11 @@ def _cookie_opts() -> dict:
 
 
 @router.post("/login")
+@limiter.limit("5/minute")
 def login(body: LoginRequest, request: Request, response: Response, db: Session = Depends(get_db)):
     user = authenticate(db, body.email, body.password)
     if user is None:
+        db.commit()
         raise HTTPException(status_code=401, detail="Credenciales incorrectas")
 
     token = create_session(

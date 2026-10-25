@@ -18,7 +18,7 @@ export function formatDate(dateString: string): string {
 }
 
 export function isOutOfStock(variants: { stock: number }[]): boolean {
-  return variants.every((v) => v.stock === 0);
+  return variants.length > 0 && variants.every((v) => v.stock === 0);
 }
 
 export function formatInventoryDate(isoString: string): string {

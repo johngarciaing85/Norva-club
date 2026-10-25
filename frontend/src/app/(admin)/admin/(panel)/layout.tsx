@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AuthProvider, useAuth } from "@/lib/admin-auth";
 import { AdminShell } from "@/components/admin/AdminShell";
@@ -10,17 +10,18 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.replace("/admin/login");
+    }
+  }, [isLoading, user, router]);
+
+  if (isLoading || !user) {
     return (
       <div className="flex min-h-svh items-center justify-center">
         <p className="text-muted-foreground">Cargando…</p>
       </div>
     );
-  }
-
-  if (!user) {
-    router.push("/admin/login");
-    return null;
   }
 
   return <AdminShell>{children}</AdminShell>;

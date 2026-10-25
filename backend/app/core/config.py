@@ -7,7 +7,6 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
     FRONTEND_URL: str = "http://localhost:3000"
-    SESSION_SECRET: str = "change-me-in-production"
     CLOUDINARY_URL: str = ""
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
