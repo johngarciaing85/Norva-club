@@ -41,6 +41,9 @@ export function Footer() {
               Información
             </h3>
             <nav className="flex flex-col gap-2 mb-6">
+              <Link href="/sobre-nosotros" className="text-sm text-background/80 hover:text-background transition-colors">
+                Sobre nosotros
+              </Link>
               <Link href="/cambios-y-devoluciones" className="text-sm text-background/80 hover:text-background transition-colors">
                 Cambios y devoluciones
               </Link>
@@ -49,8 +52,9 @@ export function Footer() {
               Contacto
             </h3>
             <div className="flex flex-col gap-2 text-sm text-background/80">
-              <p>WhatsApp: [número pendiente]</p>
-              <p>Email: [correo pendiente]</p>
+              <a href="https://wa.me/573042339380" target="_blank" rel="noopener noreferrer" className="hover:text-background transition-colors">
+                WhatsApp: 304 233 9380
+              </a>
               <p>Bogotá, Colombia</p>
             </div>
           </div>

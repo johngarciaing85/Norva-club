@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { fetchCategories, fetchProducts } from "@/lib/api/client";
 import { ProductGrid } from "@/components/shop/ProductGrid";
+import { HeroVideo } from "@/components/shop/HeroVideo";
 
 export const instant = false;
 
@@ -32,18 +33,20 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="relative flex items-center justify-center bg-foreground text-background py-24 sm:py-32 px-4">
-        <div className="text-center space-y-4">
-          <h1 className="font-heading font-bold text-4xl sm:text-6xl tracking-[0.12em] uppercase">
+      <section className="relative flex items-center justify-center overflow-hidden bg-black text-white min-h-[80vh] sm:min-h-[90vh] px-4">
+        <HeroVideo src="/hero-bg.mp4" />
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="relative z-10 text-center space-y-4">
+          <h1 className="font-heading font-bold text-4xl sm:text-6xl lg:text-7xl tracking-[0.12em] uppercase drop-shadow-lg">
             N&Oacute;RVA STYLE
           </h1>
-          <p className="text-sm sm:text-base tracking-[0.3em] uppercase text-background/60">
+          <p className="text-sm sm:text-base tracking-[0.3em] uppercase text-white/70">
             Move Different.
           </p>
-          <div className="pt-4">
+          <div className="pt-6">
             <Link
               href="/catalogo"
-              className="inline-block border border-background/30 hover:border-background px-8 py-3 text-sm tracking-widest uppercase transition-colors"
+              className="inline-block border border-white/40 hover:border-white hover:bg-white/10 px-10 py-3.5 text-sm tracking-widest uppercase transition-all duration-300"
             >
               Ver catálogo
             </Link>
