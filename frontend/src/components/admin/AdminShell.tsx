@@ -7,6 +7,7 @@ import {
   Package,
   Warehouse,
   FileText,
+  Tags,
   LogOut,
 } from "lucide-react";
 import { cn } from "cn";
@@ -15,6 +16,7 @@ import { useAuth } from "@/lib/admin-auth";
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/productos", label: "Productos", icon: Package },
+  { href: "/admin/categorias", label: "Categorías", icon: Tags },
   { href: "/admin/inventario", label: "Inventario", icon: Warehouse },
   { href: "/admin/comprobantes", label: "Comprobantes", icon: FileText },
 ];

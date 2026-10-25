@@ -155,6 +155,67 @@ def archive_product(session: Session, product: Product) -> None:
     session.flush()
 
 
+# ── Admin Categories ───────────────────────────────────────────
+
+
+def get_category_by_id(session: Session, category_id: uuid.UUID) -> Category | None:
+    return session.get(Category, category_id)
+
+
+def create_category(session: Session, data: dict) -> Category:
+    max_order = session.scalar(select(func.max(Category.sort_order))) or 0
+    cat = Category(
+        name=data["name"],
+        slug=data["slug"],
+        description=data.get("description", ""),
+        size_type=data["sizeType"],
+        sort_order=max_order + 1,
+    )
+    session.add(cat)
+    session.flush()
+    return cat
+
+
+def update_category(session: Session, cat: Category, data: dict) -> Category:
+    for field in ("name", "slug", "description"):
+        if field in data:
+            setattr(cat, field, data[field])
+    if "sizeType" in data:
+        cat.size_type = data["sizeType"]
+    session.flush()
+    return cat
+
+
+def delete_category(session: Session, cat: Category) -> None:
+    cat.is_active = False
+    session.flush()
+
+
+# ── Admin Sizes ────────────────────────────────────────────────
+
+
+def list_sizes(session: Session, size_group: str | None = None) -> list[Size]:
+    stmt = select(Size).order_by(Size.size_group, Size.sort_order)
+    if size_group:
+        stmt = stmt.where(Size.size_group == size_group)
+    return list(session.scalars(stmt))
+
+
+def create_size(session: Session, label: str, size_group: str) -> Size:
+    max_order = session.scalar(
+        select(func.max(Size.sort_order)).where(Size.size_group == size_group)
+    ) or 0
+    size = Size(label=label, size_group=size_group, sort_order=max_order + 1)
+    session.add(size)
+    session.flush()
+    return size
+
+
+def delete_size(session: Session, size: Size) -> None:
+    session.delete(size)
+    session.flush()
+
+
 def _sync_variants(session: Session, product: Product, variants_data: list[dict]) -> None:
     existing = {v.size.label: v for v in product.variants}
 

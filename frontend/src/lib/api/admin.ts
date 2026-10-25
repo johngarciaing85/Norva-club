@@ -124,6 +124,57 @@ export async function adminListCategories(): Promise<Category[]> {
   return adminFetch<Category[]>("/admin/categories");
 }
 
+export async function adminCreateCategory(
+  data: { name: string; slug: string; description?: string; sizeType: string },
+): Promise<Category> {
+  return adminFetch<Category>("/admin/categories", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function adminUpdateCategory(
+  id: string,
+  data: { name?: string; slug?: string; description?: string; sizeType?: string },
+): Promise<Category> {
+  return adminFetch<Category>(`/admin/categories/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function adminDeleteCategory(id: string): Promise<void> {
+  await adminFetch(`/admin/categories/${id}`, { method: "DELETE" });
+}
+
+// ── Sizes ──────────────────────────────────────────────────────
+
+export interface SizeItem {
+  id: string;
+  label: string;
+  sizeGroup: string;
+  sortOrder: number;
+}
+
+export async function adminListSizes(sizeGroup?: string): Promise<SizeItem[]> {
+  const qs = sizeGroup ? `?size_group=${sizeGroup}` : "";
+  return adminFetch<SizeItem[]>(`/admin/sizes${qs}`);
+}
+
+export async function adminCreateSize(
+  label: string,
+  sizeGroup: string,
+): Promise<SizeItem> {
+  return adminFetch<SizeItem>("/admin/sizes", {
+    method: "POST",
+    body: JSON.stringify({ label, sizeGroup }),
+  });
+}
+
+export async function adminDeleteSize(id: string): Promise<void> {
+  await adminFetch(`/admin/sizes/${id}`, { method: "DELETE" });
+}
+
 // ── Media ───────────────────────────────────────────────────────
 
 export interface UploadResult {

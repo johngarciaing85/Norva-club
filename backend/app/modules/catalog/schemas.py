@@ -102,3 +102,35 @@ class ProductUpdateIn(BaseModel):
     sizeGuide: str | None = None
     variants: list[dict] | None = None
     images: list[dict] | None = None
+
+
+# ── Category CRUD schemas ──────────────────────────────────────
+
+
+class CategoryCreateIn(BaseModel):
+    name: str
+    slug: str
+    description: str = ""
+    sizeType: str
+
+
+class CategoryUpdateIn(BaseModel):
+    name: str | None = None
+    slug: str | None = None
+    description: str | None = None
+    sizeType: str | None = None
+
+
+# ── Size schemas ───────────────────────────────────────────────
+
+
+class SizeOut(BaseModel):
+    id: str
+    label: str
+    sizeGroup: str
+    sortOrder: int
+
+
+class SizeCreateIn(BaseModel):
+    label: str
+    sizeGroup: str

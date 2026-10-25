@@ -11,7 +11,9 @@ import {
   adminUpdateProduct,
   adminArchiveProduct,
   adminListCategories,
+  adminListSizes,
 } from "@/lib/api/admin";
+import type { SizeItem } from "@/lib/api/admin";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,20 +22,11 @@ import { ConfirmDialog } from "./ConfirmDialog";
 import { ImageUploader } from "./ImageUploader";
 import type { AdminProduct, Category, SizeType } from "@/types";
 
-const ROPA_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
-const CALZADO_SIZES = ["36", "37", "38", "39", "40", "41", "42", "43", "44"];
-const UNICA_SIZES = ["Única"];
-
-function getSizesForType(sizeType: SizeType): string[] {
-  switch (sizeType) {
-    case "ropa":
-      return ROPA_SIZES;
-    case "calzado":
-      return CALZADO_SIZES;
-    case "unica":
-      return UNICA_SIZES;
-  }
-}
+const FALLBACK_SIZES: Record<SizeType, string[]> = {
+  ropa: ["XS", "S", "M", "L", "XL", "XXL"],
+  calzado: ["36", "37", "38", "39", "40", "41", "42", "43", "44"],
+  unica: ["Única"],
+};
 
 interface ImageData {
   id?: string;
@@ -52,6 +45,7 @@ export function ProductForm({ product }: ProductFormProps) {
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const [showArchiveDialog, setShowArchiveDialog] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [allSizes, setAllSizes] = useState<SizeItem[]>([]);
   const [images, setImages] = useState<ImageData[]>(
     product?.images.map((img) => ({
       id: img.id,
@@ -63,7 +57,15 @@ export function ProductForm({ product }: ProductFormProps) {
 
   useEffect(() => {
     adminListCategories().then(setCategories).catch(() => {});
+    adminListSizes().then(setAllSizes).catch(() => {});
   }, []);
+
+  function getSizesForType(sizeType: SizeType): string[] {
+    const fromApi = allSizes
+      .filter((s) => s.sizeGroup === sizeType)
+      .map((s) => s.label);
+    return fromApi.length > 0 ? fromApi : (FALLBACK_SIZES[sizeType] ?? []);
+  }
 
   const {
     register,
@@ -95,14 +97,24 @@ export function ProductForm({ product }: ProductFormProps) {
           sizeType: "ropa",
           availability: "inmediata",
           status: "borrador",
-          variants: ROPA_SIZES.map((s) => ({ size: s, stock: 0 })),
+          variants: FALLBACK_SIZES.ropa.map((s) => ({ size: s, stock: 0 })),
         },
   });
 
-  const { fields, replace } = useFieldArray({ control, name: "variants" });
+  const { fields, replace, remove, append } = useFieldArray({ control, name: "variants" });
 
   const selectedCategoryId = watch("categoryId");
   const selectedSizeType = watch("sizeType");
+
+  useEffect(() => {
+    if (!isEditing && allSizes.length > 0 && fields.length > 0) {
+      const apiSizes = getSizesForType(selectedSizeType);
+      if (apiSizes.length > 0) {
+        replace(apiSizes.map((s) => ({ size: s, stock: 0 })));
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allSizes]);
 
   useEffect(() => {
     const cat = categories.find((c) => c.id === selectedCategoryId);
@@ -110,7 +122,8 @@ export function ProductForm({ product }: ProductFormProps) {
       setValue("sizeType", cat.sizeType);
       replace(getSizesForType(cat.sizeType).map((s) => ({ size: s, stock: 0 })));
     }
-  }, [selectedCategoryId, selectedSizeType, setValue, replace, categories]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategoryId, selectedSizeType, setValue, replace, categories, allSizes]);
 
   async function onSubmit(data: ProductFormData) {
     try {
@@ -249,9 +262,19 @@ export function ProductForm({ product }: ProductFormProps) {
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-6">
             {fields.map((field, index) => (
               <div key={field.id} className="space-y-1">
-                <span className="text-xs font-medium text-muted-foreground">
-                  {field.size}
-                </span>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {field.size}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => remove(index)}
+                    className="text-muted-foreground hover:text-destructive transition-colors"
+                    title="Quitar talla"
+                  >
+                    <span className="text-xs">✕</span>
+                  </button>
+                </div>
                 <Input
                   type="number"
                   min={0}
@@ -261,6 +284,38 @@ export function ProductForm({ product }: ProductFormProps) {
               </div>
             ))}
           </div>
+
+          {/* Add size */}
+          {(() => {
+            const currentSizes = new Set(fields.map((f) => f.size));
+            const available = getSizesForType(selectedSizeType).filter(
+              (s) => !currentSizes.has(s),
+            );
+            if (available.length === 0) return null;
+            return (
+              <div className="flex gap-2 items-center">
+                <select
+                  id="add-size-select"
+                  className="flex h-8 rounded-lg border border-input bg-background px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                  defaultValue=""
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (!val) return;
+                    append({ size: val, stock: 0 });
+                    e.target.value = "";
+                  }}
+                >
+                  <option value="">+ Agregar talla...</option>
+                  {available.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            );
+          })()}
+
           {errors.variants && (
             <p className="text-xs text-destructive">
               {errors.variants.message ?? errors.variants.root?.message}
