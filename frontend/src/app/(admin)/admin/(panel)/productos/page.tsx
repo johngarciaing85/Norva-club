@@ -98,7 +98,7 @@ export default function ProductosPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ID</TableHead>
+                  <TableHead className="w-12">#</TableHead>
                   <TableHead>Nombre</TableHead>
                   <TableHead>Precio</TableHead>
                   <TableHead>Stock total</TableHead>
@@ -107,10 +107,10 @@ export default function ProductosPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {products.map((product) => (
+                {products.map((product, index) => (
                   <TableRow key={product.id}>
-                    <TableCell className="font-mono text-xs text-muted-foreground">
-                      {product.id.slice(0, 8)}
+                    <TableCell className="tabular-nums text-muted-foreground">
+                      {products.length - index}
                     </TableCell>
                     <TableCell className="font-medium">{product.name}</TableCell>
                     <TableCell className="tabular-nums">
@@ -144,17 +144,19 @@ export default function ProductosPage() {
 
           {/* Mobile cards */}
           <div className="space-y-3 md:hidden">
-            {products.map((product) => (
+            {products.map((product, index) => (
               <Link
                 key={product.id}
                 href={`/admin/productos/${product.id}`}
                 className="flex items-center justify-between rounded-lg border bg-card p-3 transition-colors hover:bg-accent"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">{product.name}</p>
+                  <p className="truncate font-medium">
+                    <span className="text-muted-foreground">#{products.length - index}</span>{" "}
+                    {product.name}
+                  </p>
                   <p className="text-sm text-muted-foreground tabular-nums">
-                    <span className="font-mono text-xs">{product.id.slice(0, 8)}</span>
-                    {" · "}{formatCOP(product.price)} · Stock: {totalStock(product.variants)}
+                    {formatCOP(product.price)} · Stock: {totalStock(product.variants)}
                   </p>
                 </div>
                 <ProductStatusBadge status={product.status} />
