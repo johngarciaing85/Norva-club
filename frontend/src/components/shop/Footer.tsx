@@ -44,9 +44,6 @@ export function Footer() {
               <Link href="/sobre-nosotros" className="text-sm text-background/80 hover:text-background transition-colors">
                 Sobre nosotros
               </Link>
-              <Link href="/cambios-y-devoluciones" className="text-sm text-background/80 hover:text-background transition-colors">
-                Cambios y devoluciones
-              </Link>
             </nav>
             <h3 className="text-xs font-semibold uppercase tracking-widest text-background/50 mb-3">
               Contacto
@@ -55,7 +52,7 @@ export function Footer() {
               <a href="https://wa.me/573042339380" target="_blank" rel="noopener noreferrer" className="hover:text-background transition-colors">
                 WhatsApp: 304 233 9380
               </a>
-              <p>Bogotá, Colombia</p>
+              <p>Medellín, Colombia</p>
             </div>
           </div>
         </div>
