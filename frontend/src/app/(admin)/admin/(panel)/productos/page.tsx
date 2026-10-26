@@ -98,6 +98,7 @@ export default function ProductosPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>ID</TableHead>
                   <TableHead>Nombre</TableHead>
                   <TableHead>Precio</TableHead>
                   <TableHead>Stock total</TableHead>
@@ -108,6 +109,9 @@ export default function ProductosPage() {
               <TableBody>
                 {products.map((product) => (
                   <TableRow key={product.id}>
+                    <TableCell className="font-mono text-xs text-muted-foreground">
+                      {product.id.slice(0, 8)}
+                    </TableCell>
                     <TableCell className="font-medium">{product.name}</TableCell>
                     <TableCell className="tabular-nums">
                       {formatCOP(product.price)}
@@ -129,7 +133,7 @@ export default function ProductosPage() {
                 ))}
                 {products.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground">
+                    <TableCell colSpan={6} className="text-center text-muted-foreground">
                       No se encontraron productos
                     </TableCell>
                   </TableRow>
@@ -149,7 +153,8 @@ export default function ProductosPage() {
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium">{product.name}</p>
                   <p className="text-sm text-muted-foreground tabular-nums">
-                    {formatCOP(product.price)} · Stock: {totalStock(product.variants)}
+                    <span className="font-mono text-xs">{product.id.slice(0, 8)}</span>
+                    {" · "}{formatCOP(product.price)} · Stock: {totalStock(product.variants)}
                   </p>
                 </div>
                 <ProductStatusBadge status={product.status} />
