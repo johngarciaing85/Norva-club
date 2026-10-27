@@ -23,6 +23,7 @@ export const productSchema = z.object({
   categoryId: z.string().min(1, "Selecciona una categoría"),
   sizeType: z.enum(["ropa", "calzado", "unica"]),
   availability: z.enum(["inmediata", "bajo_confirmacion"]),
+  gender: z.enum(["dama", "caballero", "unisex"]),
   status: z.enum(["borrador", "publicado", "archivado"]),
   variants: z.array(sizeVariantSchema).min(1, "Al menos una talla es necesaria"),
 });

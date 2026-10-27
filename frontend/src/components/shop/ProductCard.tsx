@@ -44,9 +44,16 @@ export function ProductCard({ product }: ProductCardProps) {
         <h3 className="text-sm font-medium leading-tight line-clamp-2">
           {product.name}
         </h3>
-        <p className={`text-sm font-semibold ${soldOut ? "text-muted-foreground" : ""}`}>
-          {formatCOP(product.price)}
-        </p>
+        <div className="flex items-center gap-2">
+          <p className={`text-sm font-semibold ${soldOut ? "text-muted-foreground" : ""}`}>
+            {formatCOP(product.price)}
+          </p>
+          {product.gender !== "unisex" && (
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              {product.gender === "dama" ? "Dama" : "Caballero"}
+            </span>
+          )}
+        </div>
       </div>
     </Link>
   );

@@ -49,6 +49,7 @@ def _admin_product_to_dict(p: Product) -> dict:
             for img in p.images
         ],
         "availability": p.availability.value,
+        "gender": p.gender.value,
         "status": p.status.value,
         "sizeGuide": p.size_guide,
         "inventoryUpdatedAt": (

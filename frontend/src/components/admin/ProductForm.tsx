@@ -85,6 +85,7 @@ export function ProductForm({ product }: ProductFormProps) {
           categoryId: product.categoryId,
           sizeType: product.sizeType,
           availability: product.availability,
+          gender: product.gender,
           status: product.status,
           variants: product.variants,
         }
@@ -96,6 +97,7 @@ export function ProductForm({ product }: ProductFormProps) {
           categoryId: "",
           sizeType: "ropa",
           availability: "inmediata",
+          gender: "unisex",
           status: "borrador",
           variants: FALLBACK_SIZES.ropa.map((s) => ({ size: s, stock: 0 })),
         },
@@ -199,7 +201,7 @@ export function ProductForm({ product }: ProductFormProps) {
           )}
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-2">
             <Label htmlFor="price">Precio (COP)</Label>
             <Input
@@ -229,6 +231,19 @@ export function ProductForm({ product }: ProductFormProps) {
             {errors.categoryId && (
               <p className="text-xs text-destructive">{errors.categoryId.message}</p>
             )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="gender">Género</Label>
+            <select
+              id="gender"
+              className="flex h-8 w-full rounded-lg border border-input bg-background px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+              {...register("gender")}
+            >
+              <option value="dama">Dama</option>
+              <option value="caballero">Caballero</option>
+              <option value="unisex">Unisex</option>
+            </select>
           </div>
 
           <div className="space-y-2">

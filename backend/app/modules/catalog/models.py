@@ -40,9 +40,16 @@ class Availability(str, enum.Enum):
     bajo_confirmacion = "bajo_confirmacion"
 
 
+class Gender(str, enum.Enum):
+    dama = "dama"
+    caballero = "caballero"
+    unisex = "unisex"
+
+
 _size_group_type = SAEnum(SizeGroup, name="size_group_type")
 _product_status_type = SAEnum(ProductStatus, name="product_status_type")
 _availability_type = SAEnum(Availability, name="availability_type")
+_gender_type = SAEnum(Gender, name="gender_type")
 
 
 class Size(Base):
@@ -91,6 +98,9 @@ class Product(Base):
     )
     availability: Mapped[Availability] = mapped_column(
         _availability_type, default=Availability.inmediata
+    )
+    gender: Mapped[Gender] = mapped_column(
+        _gender_type, default=Gender.unisex
     )
     inventory_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(

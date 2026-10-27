@@ -20,6 +20,7 @@ def _product_to_dict(p: Product) -> dict:
         "categoryId": str(p.category_id),
         "categorySlug": p.category.slug,
         "sizeType": p.category.size_type.value,
+        "gender": p.gender.value,
         "variants": [
             {"size": v.size.label, "stock": v.stock}
             for v in sorted(p.variants, key=lambda v: v.size.sort_order)

@@ -29,9 +29,16 @@ export function ProductDetail({ product, sizeGuide }: ProductDetailProps) {
           <h1 className="text-2xl font-heading font-bold sm:text-3xl">
             {product.name}
           </h1>
-          <p className="mt-2 text-xl font-semibold">
-            {formatCOP(product.price)}
-          </p>
+          <div className="mt-2 flex items-center gap-3">
+            <p className="text-xl font-semibold">
+              {formatCOP(product.price)}
+            </p>
+            {product.gender !== "unisex" && (
+              <Badge variant="outline" className="text-xs uppercase tracking-wider">
+                {product.gender === "dama" ? "Dama" : "Caballero"}
+              </Badge>
+            )}
+          </div>
         </div>
 
         {soldOut && (

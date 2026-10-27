@@ -1,5 +1,6 @@
 export type SizeType = "ropa" | "calzado" | "unica";
 export type Availability = "inmediata" | "bajo_confirmacion";
+export type Gender = "dama" | "caballero" | "unisex";
 
 export interface SizeVariant {
   size: string;
@@ -24,6 +25,7 @@ export interface Product {
   variants: SizeVariant[];
   images: ProductImage[];
   availability: Availability;
+  gender: Gender;
   inventoryUpdatedAt: string | null;
 }
 

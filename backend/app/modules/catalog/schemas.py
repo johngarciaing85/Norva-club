@@ -21,6 +21,7 @@ class ProductSummaryOut(BaseModel):
     categoryId: str
     categorySlug: str
     sizeType: str
+    gender: str
     variants: list[VariantOut]
     images: list[ImageOut]
     availability: str
@@ -65,6 +66,7 @@ class AdminProductOut(BaseModel):
     categoryId: str
     categorySlug: str
     sizeType: str
+    gender: str
     variants: list[VariantOut]
     images: list[AdminImageOut]
     availability: str
@@ -86,6 +88,7 @@ class ProductCreateIn(BaseModel):
     categoryId: str
     status: str = "borrador"
     availability: str = "inmediata"
+    gender: str = "unisex"
     sizeGuide: str | None = None
     variants: list[dict] = []
     images: list[dict] = []
@@ -99,6 +102,7 @@ class ProductUpdateIn(BaseModel):
     categoryId: str | None = None
     status: str | None = None
     availability: str | None = None
+    gender: str | None = None
     sizeGuide: str | None = None
     variants: list[dict] | None = None
     images: list[dict] | None = None

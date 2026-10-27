@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.modules.catalog.models import (
     Category,
+    Gender,
     Product,
     ProductImage,
     ProductStatus,
@@ -112,6 +113,7 @@ def create_product(session: Session, data: dict) -> Product:
         category_id=uuid.UUID(data["categoryId"]),
         status=ProductStatus(data.get("status", "borrador")),
         availability=data.get("availability", "inmediata"),
+        gender=Gender(data.get("gender", "unisex")),
         size_guide=data.get("sizeGuide"),
         inventory_updated_at=datetime.now(UTC),
     )
@@ -137,6 +139,8 @@ def update_product(session: Session, product: Product, data: dict) -> Product:
         product.status = ProductStatus(data["status"])
     if "availability" in data:
         product.availability = data["availability"]
+    if "gender" in data:
+        product.gender = Gender(data["gender"])
     if "sizeGuide" in data:
         product.size_guide = data["sizeGuide"]
 
